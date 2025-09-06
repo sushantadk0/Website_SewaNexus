@@ -1,0 +1,93 @@
+* {
+    margin: 0;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --txt: #111827;
+    --muted: #6b7280;
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --desc: #ff005d;
+    --ring: rgba(37, 99, 235, 0.35);
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+body {
+    height: 100vh;
+    background: url("images/background.jpg");
+    background-repeat: no-repeat;
+    background-size: 100%;
+}
+
+.hero-title {
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.txt1,
+.txt2 {
+    font-size: 13rem;
+    font-weight: 800;
+    color: var(--card);
+    margin-left: 4rem;
+    margin-top: 2rem;
+}
+
+.desc-title {
+    color: var(--txt);
+    display: block;
+    font-size: 2rem;
+    text-align: center;
+    position: absolute;
+    bottom: 45%;
+    left: 35%;
+    font-weight: bolder;
+}
+
+.hero-content {
+    margin: 4rem;
+    max-width: 20rem;
+}
+
+.hero-desc {
+    position: relative;
+    padding: 1.2rem;
+    border-radius: 0.6rem;
+    background: rgba(255, 255, 255, 0.168);
+    backdrop-filter: blur(2rem);
+    border: 1px solid rgba(255, 255, 255, 0.621);
+    color: var(--bg);
+    text-align: left;
+}
+
+
+
+/*about*/
+.about {
+    padding: 6rem 10%;
+    background: var(--card);
+}
+
+.about-content {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.about-text h2 {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    font-weight: 800;
+}
+
+.about-text p {
+    color: var(--muted);
+    margin-bottom: 1rem;
+}
+
+.about-image img {
+    width: 400px;
+    max-width: 100%;
+    border-radius: 12px;
+    box-shadow: var(--shadow-soft);
+}
