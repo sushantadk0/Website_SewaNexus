@@ -13,6 +13,109 @@
 
 <body>
     <section class="main">
+
+
+        <!-- Auth Modal -->
+        <div id="auth-modal" class="auth-modal">
+            <div class="auth-box">
+                <!-- LOGIN -->
+                <div id="login-section" class="form-section">
+                    <button id="close-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-3xl"
+                        aria-label="Close">
+                        &times;
+                    </button>
+                    <h2 class="text-3xl font-bold mb-6 text-center">Welcome back!</h2>
+                    <input type="email" id="login-email" placeholder="Email"
+                        class="w-full p-3 mb-4 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <input type="password" id="login-password" placeholder="Password"
+                        class="w-full p-3 mb-4 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <button id="login-btn"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md transition-all duration-300">
+                        Login
+                    </button>
+                    <a href="#" id="forgot-password-link" class="text-sm text-blue-600 mt-4 hover:underline">Forgot
+                        password?</a>
+
+                    <div class="flex items-center w-full my-6">
+                        <span class="flex-grow border-t border-gray-300"></span>
+                        <span class="mx-4 text-gray-500">OR</span>
+                        <span class="flex-grow border-t border-gray-300"></span>
+                    </div>
+
+                    <!-- Google Sign-In -->
+                    <div id="g_id_onload"
+                        data-client_id="860150620389-2vl8mvt33hem5v3gh9m376an2nd068o8.apps.googleusercontent.com"
+                        data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse"
+                        data-auto_prompt="false">
+                    </div>
+                    <div class="g_id_signin" data-type="standard" data-size="large"></div>
+
+                    <p class="mt-6 text-sm text-gray-600">
+                        Don't have an account?
+                        <a href="#" id="show-signup-link" class="text-blue-600 font-semibold hover:underline">Sign
+                            Up</a>
+                    </p>
+                </div>
+
+
+
+                <!-- FORGOT PASSWORD -->
+                <div id="forgot-section" class="form-section hidden">
+                    <button id="close-modal-forgot"
+                        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-3xl">&times;</button>
+                    <h2 class="text-3xl font-bold mb-6 text-center">Reset Password</h2>
+                    <input type="email" id="forgot-email" placeholder="Enter your email"
+                        class="w-full p-3 mb-4 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <button id="forgot-btn"
+                        class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 rounded-lg shadow-md transition-all duration-300">Send
+                        Reset Link</button>
+                    <p class="mt-6 text-sm text-gray-600">Remember your password? <a href="#" id="back-login-link"
+                            class="text-blue-600 font-semibold hover:underline">Log in</a></p>
+                </div>
+
+
+                <!-- SIGN UP -->
+                <div id="signup-section" class="form-section hidden">
+                    <button id="close-modal-signup"
+                        class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-3xl" aria-label="Close">
+                        &times;
+                    </button>
+                    <h2 class="text-3xl font-bold mb-6 text-center">Create Account</h2>
+                    <input type="text" id="signup-name" placeholder="Full name (optional)"
+                        class="w-full p-3 mb-4 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <input type="email" id="signup-email" placeholder="Email"
+                        class="w-full p-3 mb-4 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <input type="password" id="signup-password" placeholder="Password"
+                        class="w-full p-3 mb-4 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <button id="signup-btn"
+                        class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg shadow-md transition-all duration-300">
+                        Sign Up
+                    </button>
+
+                    <div class="flex items-center w-full my-6">
+                        <span class="flex-grow border-t border-gray-300"></span>
+                        <span class="mx-4 text-gray-500">OR</span>
+                        <span class="flex-grow border-t border-gray-300"></span>
+                    </div>
+
+                    <!-- Google Sign-In -->
+                    <div id="g_id_onload"
+                        data-client_id="860150620389-2vl8mvt33hem5v3gh9m376an2nd068o8.apps.googleusercontent.com"
+                        data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse"
+                        data-auto_prompt="false">
+                    </div>
+                    <div class="g_id_signin" data-type="standard" data-size="large"></div>
+
+                    <p class="mt-6 text-sm text-gray-600">
+                        Already have an account?
+                        <a href="#" id="show-login-link" class="text-blue-600 font-semibold hover:underline">Log in</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+
         <header class="w-full bg-neutral-200 shadow-md p-4 flex justify-between items-center">
             <h1 class="text-2xl font-bold text-gray-800">SewaNexus</h1>
             <div class="flex items-center gap-3" id="user-area">
@@ -90,37 +193,41 @@
         </div>
         </div>
     </section>
- <section class="faq-section">
-    <h2 class="faq-title">Frequently Asked Questions</h2>
+    <section class="faq-section">
+        <h2 class="faq-title">Frequently Asked Questions</h2>
 
-    <div class="faq-item">
-      <div class="faq-question">What makes this a billion-dollar website?</div>
-      <div class="faq-answer">
-        Our platform combines cutting-edge technology, seamless user experience, and global scalability, designed to deliver value at every level.
-      </div>
-    </div>
+        <div class="faq-item">
+            <div class="faq-question">What makes this a billion-dollar website?</div>
+            <div class="faq-answer">
+                Our platform combines cutting-edge technology, seamless user experience, and global scalability,
+                designed to deliver value at every level.
+            </div>
+        </div>
 
-    <div class="faq-item">
-      <div class="faq-question">Is my data secure?</div>
-      <div class="faq-answer">
-        Yes. We use enterprise-grade encryption, regular security audits, and compliance with international standards to protect your data.
-      </div>
-    </div>
+        <div class="faq-item">
+            <div class="faq-question">Is my data secure?</div>
+            <div class="faq-answer">
+                Yes. We use enterprise-grade encryption, regular security audits, and compliance with international
+                standards to protect your data.
+            </div>
+        </div>
 
-    <div class="faq-item">
-      <div class="faq-question">How can I get support?</div>
-      <div class="faq-answer">
-        You can reach our 24/7 support team through live chat, email, or by opening a support ticket directly from your dashboard.
-      </div>
-    </div>
+        <div class="faq-item">
+            <div class="faq-question">How can I get support?</div>
+            <div class="faq-answer">
+                You can reach our 24/7 support team through live chat, email, or by opening a support ticket directly
+                from your dashboard.
+            </div>
+        </div>
 
-    <div class="faq-item">
-      <div class="faq-question">Do you offer refunds?</div>
-      <div class="faq-answer">
-        Absolutely. If you're not satisfied within 30 days, we provide a full money-back guarantee, no questions asked.
-      </div>
-    </div>
-  </section>
+        <div class="faq-item">
+            <div class="faq-question">Do you offer refunds?</div>
+            <div class="faq-answer">
+                Absolutely. If you're not satisfied within 30 days, we provide a full money-back guarantee, no questions
+                asked.
+            </div>
+        </div>
+    </section>
     <section class="contact">
         <section id="contact" class="bg-gray-50 py-16 relative overflow-hidden">
             <div
@@ -235,7 +342,6 @@
             </div>
         </footer>
         <button id="toTopBtn">↑</button>
-
         <script src="script.js"></script>
 </body>
 

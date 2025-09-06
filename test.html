@@ -1,12 +1,490 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <style></style>
-</head>
-<body>
+  <style>
+    .auth-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(31, 41, 55, 0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
 
+    .auth-box {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      max-width: 32rem;
+      width: 120%;
+      margin: 1rem;
+      display: flex;
+      position: relative;
+      min-height: 650px;
+    }
+
+    .form-section {
+      flex: 1 1 50%;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      top: 0;
+      transition: all 0.3s ease;
+      z-index: 2;
+      position: relative;
+      width: 100%;
+      left: 0;
+      right: 0;
+    }
+
+    .form-section.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(100%);
+    }
+
+    .form-section.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+
+    .form-section {
+      left: 0;
+      width: 100%;
+      z-index: 2;
+      background: white;
+    }
+
+    .hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(100%);
+    }
+
+    .visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+
+    @media (max-width: 768px) {
+
+      .form-section {
+        position: relative;
+        width: 100%;
+        left: 0;
+        right: 0;
+      }
+    }
+
+    .form-section input,
+    .form-section button {
+      transition: all 0.3s ease;
+    }
+
+    #auth-illustration {
+      transition: opacity 0.3s ease;
+    }
+
+    .custom-toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #333;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.3s ease;
+      z-index: 9999;
+    }
+
+    .custom-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .custom-toast.error {
+      background: #d9534f;
+    }
+
+    .show-modal {
+      animation: fadeIn 0.3s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <button id="auth-button"
+    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-full shadow-md transition-all duration-300">
+    Login
+  </button>
+  <!-- Auth Modal -->
+  <div id="auth-modal" class="auth-modal">
+    <div class="auth-box">
+      <!-- LOGIN -->
+      <div id="login-section" class="form-section">
+        <button id="close-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-3xl"
+          aria-label="Close">
+          &times;
+        </button>
+        <h2 class="text-3xl font-bold mb-6 text-center">Welcome back!</h2>
+        <input type="email" id="login-email" placeholder="Email"
+          class="w-full p-3 mb-4 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <input type="password" id="login-password" placeholder="Password"
+          class="w-full p-3 mb-4 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <button id="login-btn"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md transition-all duration-300">
+          Login
+        </button>
+        <a href="#" id="forgot-password-link" class="text-sm text-blue-600 mt-4 hover:underline">Forgot
+          password?</a>
+
+        <div class="flex items-center w-full my-6">
+          <span class="flex-grow border-t border-gray-300"></span>
+          <span class="mx-4 text-gray-500">OR</span>
+          <span class="flex-grow border-t border-gray-300"></span>
+        </div>
+
+        <!-- Google Sign-In -->
+        <div id="g_id_onload" data-client_id="860150620389-2vl8mvt33hem5v3gh9m376an2nd068o8.apps.googleusercontent.com"
+          data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin" data-type="standard" data-size="large"></div>
+
+        <p class="mt-6 text-sm text-gray-600">
+          Don't have an account?
+          <a href="#" id="show-signup-link" class="text-blue-600 font-semibold hover:underline">Sign Up</a>
+        </p>
+      </div>
+
+
+
+      <!-- FORGOT PASSWORD -->
+      <div id="forgot-section" class="form-section hidden">
+        <button id="close-modal-forgot"
+          class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-3xl">&times;</button>
+        <h2 class="text-3xl font-bold mb-6 text-center">Reset Password</h2>
+        <input type="email" id="forgot-email" placeholder="Enter your email"
+          class="w-full p-3 mb-4 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <button id="forgot-btn"
+          class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 rounded-lg shadow-md transition-all duration-300">Send
+          Reset Link</button>
+        <p class="mt-6 text-sm text-gray-600">Remember your password? <a href="#" id="back-login-link"
+            class="text-blue-600 font-semibold hover:underline">Log in</a></p>
+      </div>
+
+
+      <!-- SIGN UP -->
+      <div id="signup-section" class="form-section hidden">
+        <button id="close-modal-signup" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-3xl"
+          aria-label="Close">
+          &times;
+        </button>
+        <h2 class="text-3xl font-bold mb-6 text-center">Create Account</h2>
+        <input type="text" id="signup-name" placeholder="Full name (optional)"
+          class="w-full p-3 mb-4 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <input type="email" id="signup-email" placeholder="Email"
+          class="w-full p-3 mb-4 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <input type="password" id="signup-password" placeholder="Password"
+          class="w-full p-3 mb-4 rounded-lg bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <button id="signup-btn"
+          class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg shadow-md transition-all duration-300">
+          Sign Up
+        </button>
+
+        <div class="flex items-center w-full my-6">
+          <span class="flex-grow border-t border-gray-300"></span>
+          <span class="mx-4 text-gray-500">OR</span>
+          <span class="flex-grow border-t border-gray-300"></span>
+        </div>
+
+        <!-- Google Sign-In -->
+        <div id="g_id_onload" data-client_id="860150620389-2vl8mvt33hem5v3gh9m376an2nd068o8.apps.googleusercontent.com"
+          data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin" data-type="standard" data-size="large"></div>
+
+        <p class="mt-6 text-sm text-gray-600">
+          Already have an account?
+          <a href="#" id="show-login-link" class="text-blue-600 font-semibold hover:underline">Log in</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+
+
+  <script>
+
+    const authButton = document.getElementById("auth-button");
+    const authModal = document.getElementById("auth-modal");
+    const closeModal = document.getElementById("close-modal");
+    const closeModalSignup = document.getElementById("close-modal-signup");
+
+    const loginSection = document.getElementById("login-section");
+    const signupSection = document.getElementById("signup-section");
+    const authIllustration = document.getElementById("auth-illustration");
+
+    const showSignupLink = document.getElementById("show-signup-link");
+    const showLoginLink = document.getElementById("show-login-link");
+
+    const loginBtn = document.getElementById("login-btn");
+    const signupBtn = document.getElementById("signup-btn");
+
+    // ------------------- Toast System (Tailwind slide-in top-right) -------------------
+    function showToast(message, type = "success") {
+      // Create container if not exists
+      let container = document.getElementById("toast-container");
+      if (!container) {
+        container = document.createElement("div");
+        container.id = "toast-container";
+        container.className = "fixed top-6 right-6 flex flex-col gap-4 z-50";
+        document.body.appendChild(container);
+      }
+
+      // Create toast
+      const toast = document.createElement("div");
+      toast.className = `max-w-xs w-full px-6 py-3 rounded-lg shadow-lg text-white font-semibold transform transition-all duration-300 ${type === "success" ? "bg-green-600" : "bg-red-600"
+        } translate-x-24 opacity-0`;
+      toast.innerText = message;
+
+      container.appendChild(toast);
+
+      // Slide in
+      setTimeout(() => {
+        toast.classList.remove("translate-x-24", "opacity-0");
+        toast.classList.add("translate-x-0", "opacity-100");
+      }, 50);
+
+      // Auto remove
+      setTimeout(() => {
+        toast.classList.add("translate-x-24", "opacity-0");
+        setTimeout(() => toast.remove(), 500);
+      }, 3000);
+    }
+
+    // ------------------- Modal Functions -------------------
+    const resetModal = () => {
+      loginSection.classList.remove("hidden");
+      signupSection.classList.add("hidden");
+
+      document.getElementById("login-email").value = "";
+      document.getElementById("login-password").value = "";
+      document.getElementById("signup-name").value = "";
+      document.getElementById("signup-email").value = "";
+      document.getElementById("signup-password").value = "";
+    };
+
+    authButton?.addEventListener("click", () => {
+      resetModal();
+      authModal.style.display = "flex";
+    });
+
+    const closeAll = () => {
+      authModal.style.display = "none";
+      resetModal();
+    };
+    closeModal?.addEventListener("click", closeAll);
+    closeModalSignup?.addEventListener("click", closeAll);
+
+    showSignupLink?.addEventListener("click", (e) => {
+      e.preventDefault();
+      loginSection.classList.add("hidden");
+      signupSection.classList.remove("hidden");
+    });
+
+    showLoginLink?.addEventListener("click", (e) => {
+      e.preventDefault();
+      signupSection.classList.add("hidden");
+      loginSection.classList.remove("hidden");
+    });
+
+    function changeIllustration(newSrc) {
+      authIllustration.style.opacity = "0";
+      setTimeout(() => {
+        authIllustration.src = newSrc;
+        authIllustration.style.opacity = "1";
+      }, 300);
+    }
+
+    // ------------------- Login -------------------
+    loginBtn?.addEventListener("click", async () => {
+      const email = document.getElementById("login-email").value.trim();
+      const password = document.getElementById("login-password").value;
+      if (!email || !password) return showToast("Please fill all fields", "danger");
+
+      try {
+        const res = await fetch("auth.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ action: "login", email, password }),
+        });
+        const text = await res.text();
+        if (text.includes("success")) {
+          showToast("Login successful!", "success");
+          window.location.href = "dashboard.php";
+        } else {
+          showToast(text, "danger");
+        }
+      } catch (err) {
+        showToast("Login failed. Try again.", "danger");
+      }
+    });
+
+    // ------------------- Signup -------------------
+    signupBtn?.addEventListener("click", async () => {
+      const name = document.getElementById("signup-name").value.trim();
+      const email = document.getElementById("signup-email").value.trim();
+      const password = document.getElementById("signup-password").value;
+      if (!email || !password)
+        return showToast("Please fill all required fields", "danger");
+
+      try {
+        const res = await fetch("auth.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ action: "signup", name, email, password }),
+        });
+        const text = await res.text();
+        if (text.includes("success")) {
+          showToast("Signup successful! Please login.", "success");
+          signupSection.classList.add("hidden");
+          loginSection.classList.remove("hidden");
+        } else {
+          showToast(text, "danger");
+        }
+      } catch (err) {
+        showToast("Signup failed. Try again.", "danger");
+      }
+    });
+
+    // ------------------- Google One Tap -------------------
+    window.handleCredentialResponse = async (response) => {
+      try {
+        const id_token = response.credential;
+        const res = await fetch("auth.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ action: "google", id_token }),
+        });
+        const txt = await res.text();
+        if (txt.includes("success")) {
+          showToast("Google sign-in successful!", "success");
+          window.location.href = "dashboard.php";
+        } else {
+          showToast(txt, "danger");
+        }
+      } catch (e) {
+        showToast("Google sign-in failed.", "danger");
+      }
+    };
+
+    // ESC key to close modal
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeAll();
+    });
+
+    //Forgot Password
+
+
+    const forgotSection = document.getElementById("forgot-section");
+    const forgotBtn = document.getElementById("forgot-btn");
+    const forgotLink = document.getElementById("forgot-password-link");
+    const backLoginLink = document.getElementById("back-login-link");
+    const closeForgot = document.getElementById("close-modal-forgot");
+
+    // Show forgot section
+    forgotLink?.addEventListener("click", (e) => {
+      e.preventDefault();
+      loginSection.classList.add("hidden");
+      signupSection.classList.add("hidden");
+      forgotSection.classList.remove("hidden");
+    });
+
+    // Back to login
+    backLoginLink?.addEventListener("click", (e) => {
+      e.preventDefault();
+      forgotSection.classList.add("hidden");
+      loginSection.classList.remove("hidden");
+    });
+
+    // Close forgot modal
+    closeForgot?.addEventListener("click", () => {
+      forgotSection.classList.add("hidden");
+      authModal.style.display = "none";
+      resetModal(); // optional
+    });
+
+    // Forgot password button click
+    forgotBtn?.addEventListener("click", async () => {
+      const email = forgotEmail.value.trim();
+      if (!email) return showToast("Please enter your email", "danger");
+
+      const res = await fetch("auth.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ action: "forgot_password", email }),
+      });
+      const text = await res.text();
+      showToast(
+        text.includes("success") ? "Reset link sent! Check your email." : text,
+        text.includes("success") ? "success" : "danger"
+      );
+
+      if (text.includes("success")) forgotEmail.value = "";
+    });
+
+    // Handle sending forgot password request
+    forgotBtn?.addEventListener("click", async () => {
+      const email = document.getElementById("forgot-email").value.trim();
+      if (!email) return showToast("Email is required", "danger");
+
+      try {
+        const res = await fetch("auth.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ action: "forgot_password", email }),
+        });
+        const text = await res.text();
+        if (text.includes("success")) {
+          showToast("Password reset link sent to your email!", "success");
+          forgotSection.classList.add("hidden");
+          loginSection.classList.remove("hidden");
+        } else {
+          showToast(text, "danger");
+        }
+      } catch (e) {
+        showToast("Failed to send reset link. Try again.", "danger");
+      }
+    });
+
+
+  </script>
 </body>
+
 </html>
