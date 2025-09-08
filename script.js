@@ -1,265 +1,297 @@
-const items = document.querySelectorAll(".faq-item");
+document.addEventListener("DOMContentLoaded", () => {
+  const preloader = document.getElementById("preloader");
+  preloader.style.display = "flex"; 
+});
 
-items.forEach(item => {
-    item.querySelector(".faq-question").addEventListener("click", () => {
-        item.classList.toggle("active");
+window.addEventListener("load", () => {
+  const preloader = document.getElementById("preloader");
+  preloader.classList.add("fade-out");
+  preloader.addEventListener("transitionend", () => {
+    preloader.remove();
+  });
+});
+
+const progressBar = document.getElementById("scroll-progress");
+const percentText = document.getElementById("scroll-percent");
+
+gsap.to(progressBar, {
+  width: "100%",
+  ease: "none",
+  scrollTrigger: { scrub: 0.3 },
+});
+
+gsap.registerPlugin(ScrollTrigger);
+
+gsap.utils.toArray("section").forEach((el) => {
+  gsap.to(el, {
+    opacity: 1,
+    y: 0,
+    duration: 1,
+    ease: "power3.out",
+    scrollTrigger: {
+      trigger: el,
+      start: "top 80%",
+      toggleActions: "play none none reverse",
+    },
+  });
+});
+
+const lenis = new Lenis({
+  duration: 1.2,
+  easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+  smooth: true,
+});
+
+function raf(time) {
+  lenis.raf(time);
+  requestAnimationFrame(raf);
+}
+
+requestAnimationFrame(raf);
+
+ScrollTrigger.scrollerProxy(document.body.section, {
+  scrollTop(value) {
+    return arguments.length ? lenis.scrollTo(value) : lenis.scroll;
+  },
+  getBoundingClientRect() {
+    return {
+      top: 0,
+      left: 0,
+      width: window.innerWidth,
+      height: window.innerHeight,
+    };
+  },
+});
+
+
+document.querySelectorAll('.faq-question').forEach(q => {
+    q.addEventListener('click', () => {
+        q.parentElement.classList.toggle('active');
     });
 });
 
 const toTopBtn = document.getElementById("toTopBtn");
-
 window.addEventListener("scroll", () => {
-    if (window.scrollY > 300) {
-        toTopBtn.style.display = "block";
-    } else {
-        toTopBtn.style.display = "none";
-    }
+  toTopBtn.style.display = window.scrollY > 300 ? "block" : "none";
 });
-
 toTopBtn.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
+function showToast(message, type = "info") {
+  let container = document.getElementById("toast-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "toast-container";
+    container.className = "fixed top-6 right-6 flex flex-col gap-4 z-50";
+    document.body.appendChild(container);
+  }
 
-const authButton = document.getElementById("auth-button");
+  const colors = {
+    success: "bg-green-600",
+    error: "bg-red-600",
+    warning: "bg-yellow-500 text-black",
+    info: "bg-blue-600",
+  };
+
+  const toast = document.createElement("div");
+  toast.className = `max-w-xs w-full px-4 py-3 rounded shadow text-white font-medium transition-all duration-300 ${
+    colors[type] || colors.info
+  }`;
+  toast.textContent = message;
+
+  container.appendChild(toast);
+  setTimeout(() => toast.classList.add("opacity-0", "translate-x-4"), 2500);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 const authModal = document.getElementById("auth-modal");
-const closeModal = document.getElementById("close-modal");
-const closeModalSignup = document.getElementById("close-modal-signup");
-
+const authBox = document.querySelector(".auth-box");
 const loginSection = document.getElementById("login-section");
 const signupSection = document.getElementById("signup-section");
-const authIllustration = document.getElementById("auth-illustration");
-
-const showSignupLink = document.getElementById("show-signup-link");
-const showLoginLink = document.getElementById("show-login-link");
-
-const loginBtn = document.getElementById("login-btn");
-const signupBtn = document.getElementById("signup-btn");
-
-// ------------------- Toast System (Tailwind slide-in top-right) -------------------
-function showToast(message, type = "success") {
-    // Create container if not exists
-    let container = document.getElementById("toast-container");
-    if (!container) {
-        container = document.createElement("div");
-        container.id = "toast-container";
-        container.className = "fixed top-6 right-6 flex flex-col gap-4 z-50";
-        document.body.appendChild(container);
-    }
-
-    // Create toast
-    const toast = document.createElement("div");
-    toast.className = `max-w-xs w-full px-6 py-3 rounded-lg shadow-lg text-white font-semibold transform transition-all duration-300 ${type === "success" ? "bg-green-600" : "bg-red-600"
-        } translate-x-24 opacity-0`;
-    toast.innerText = message;
-
-    container.appendChild(toast);
-
-    // Slide in
-    setTimeout(() => {
-        toast.classList.remove("translate-x-24", "opacity-0");
-        toast.classList.add("translate-x-0", "opacity-100");
-    }, 50);
-
-    // Auto remove
-    setTimeout(() => {
-        toast.classList.add("translate-x-24", "opacity-0");
-        setTimeout(() => toast.remove(), 500);
-    }, 3000);
-}
-
-// ------------------- Modal Functions -------------------
-const resetModal = () => {
-    loginSection.classList.remove("hidden");
-    signupSection.classList.add("hidden");
-
-    document.getElementById("login-email").value = "";
-    document.getElementById("login-password").value = "";
-    document.getElementById("signup-name").value = "";
-    document.getElementById("signup-email").value = "";
-    document.getElementById("signup-password").value = "";
-};
-
-authButton?.addEventListener("click", () => {
-    resetModal();
-    authModal.style.display = "flex";
-});
-
-const closeAll = () => {
-    authModal.style.display = "none";
-    resetModal();
-};
-closeModal?.addEventListener("click", closeAll);
-closeModalSignup?.addEventListener("click", closeAll);
-
-showSignupLink?.addEventListener("click", (e) => {
-    e.preventDefault();
-    loginSection.classList.add("hidden");
-    signupSection.classList.remove("hidden");
-});
-
-showLoginLink?.addEventListener("click", (e) => {
-    e.preventDefault();
-    signupSection.classList.add("hidden");
-    loginSection.classList.remove("hidden");
-});
-
-function changeIllustration(newSrc) {
-    authIllustration.style.opacity = "0";
-    setTimeout(() => {
-        authIllustration.src = newSrc;
-        authIllustration.style.opacity = "1";
-    }, 300);
-}
-
-// ------------------- Login -------------------
-loginBtn?.addEventListener("click", async () => {
-    const email = document.getElementById("login-email").value.trim();
-    const password = document.getElementById("login-password").value;
-    if (!email || !password) return showToast("Please fill all fields", "danger");
-
-    try {
-        const res = await fetch("auth.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({ action: "login", email, password }),
-        });
-        const text = await res.text();
-        if (text.includes("success")) {
-            showToast("Login successful!", "success");
-            window.location.href = "dashboard.php";
-        } else {
-            showToast(text, "danger");
-        }
-    } catch (err) {
-        showToast("Login failed. Try again.", "danger");
-    }
-});
-
-// ------------------- Signup -------------------
-signupBtn?.addEventListener("click", async () => {
-    const name = document.getElementById("signup-name").value.trim();
-    const email = document.getElementById("signup-email").value.trim();
-    const password = document.getElementById("signup-password").value;
-    if (!email || !password)
-        return showToast("Please fill all required fields", "danger");
-
-    try {
-        const res = await fetch("auth.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({ action: "signup", name, email, password }),
-        });
-        const text = await res.text();
-        if (text.includes("success")) {
-            showToast("Signup successful! Please login.", "success");
-            signupSection.classList.add("hidden");
-            loginSection.classList.remove("hidden");
-        } else {
-            showToast(text, "danger");
-        }
-    } catch (err) {
-        showToast("Signup failed. Try again.", "danger");
-    }
-});
-
-// ------------------- Google One Tap -------------------
-window.handleCredentialResponse = async (response) => {
-    try {
-        const id_token = response.credential;
-        const res = await fetch("auth.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({ action: "google", id_token }),
-        });
-        const txt = await res.text();
-        if (txt.includes("success")) {
-            showToast("Google sign-in successful!", "success");
-            window.location.href = "dashboard.php";
-        } else {
-            showToast(txt, "danger");
-        }
-    } catch (e) {
-        showToast("Google sign-in failed.", "danger");
-    }
-};
-
-// ESC key to close modal
-window.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeAll();
-});
-
-//Forgot Password
-
-
 const forgotSection = document.getElementById("forgot-section");
-const forgotBtn = document.getElementById("forgot-btn");
-const forgotLink = document.getElementById("forgot-password-link");
-const backLoginLink = document.getElementById("back-login-link");
-const closeForgot = document.getElementById("close-modal-forgot");
 
-// Show forgot section
-forgotLink?.addEventListener("click", (e) => {
-    e.preventDefault();
-    loginSection.classList.add("hidden");
-    signupSection.classList.add("hidden");
-    forgotSection.classList.remove("hidden");
+function resetModal() {
+  loginSection.classList.remove("hidden");
+  signupSection.classList.add("hidden");
+  forgotSection.classList.add("hidden");
+
+  [
+    "login-email",
+    "login-password",
+    "signup-name",
+    "signup-email",
+    "signup-password",
+    "forgot-email",
+  ].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+}
+
+document.getElementById("auth-button")?.addEventListener("click", () => {
+  resetModal();
+  authModal.style.display = "flex";
+  authBox.classList.add("show-modal");
 });
 
-// Back to login
-backLoginLink?.addEventListener("click", (e) => {
+function closeAll() {
+  authBox.classList.remove("show-modal");
+  setTimeout(() => {
+    authModal.style.display = "none";
+    resetModal();
+  }, 300); 
+}
+
+["close-modal", "close-modal-signup", "close-modal-forgot"].forEach((id) => {
+  document.getElementById(id)?.addEventListener("click", closeAll);
+});
+
+document
+  .getElementById("show-signup-link")
+  ?.addEventListener("click", function (e) {
+    e.preventDefault();
+    loginSection.classList.remove("visible");
+    loginSection.classList.add("hidden");
+
+    signupSection.classList.remove("hidden");
+    signupSection.classList.add("visible");
+  });
+
+document
+  .getElementById("show-login-link")
+  ?.addEventListener("click", function (e) {
+    e.preventDefault();
+    signupSection.classList.remove("visible");
+    signupSection.classList.add("hidden");
+
+    loginSection.classList.remove("hidden");
+    loginSection.classList.add("visible");
+  });
+
+document
+  .getElementById("forgot-password-link")
+  ?.addEventListener("click", function (e) {
+    e.preventDefault();
+    loginSection.classList.add("hidden");
+    forgotSection.classList.remove("hidden");
+  });
+
+document
+  .getElementById("back-login-link")
+  ?.addEventListener("click", function (e) {
     e.preventDefault();
     forgotSection.classList.add("hidden");
     loginSection.classList.remove("hidden");
+  });
+
+window.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") closeAll();
 });
 
-// Close forgot modal
-closeForgot?.addEventListener("click", () => {
-    forgotSection.classList.add("hidden");
-    authModal.style.display = "none";
-    resetModal(); // optional
-});
+document.getElementById("login-btn")?.addEventListener("click", function () {
+  const email = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value;
 
-// Forgot password button click
-forgotBtn?.addEventListener("click", async () => {
-    const email = forgotEmail.value.trim();
-    if (!email) return showToast("Please enter your email", "danger");
+  if (!email || !password)
+    return showToast("Please fill all fields", "warning");
+  if (!isValidEmail(email)) return showToast("Invalid email format", "error");
 
-    const res = await fetch("auth.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ action: "forgot_password", email }),
-    });
-    const text = await res.text();
-    showToast(
-        text.includes("success") ? "Reset link sent! Check your email." : text,
-        text.includes("success") ? "success" : "danger"
-    );
-
-    if (text.includes("success")) forgotEmail.value = "";
-});
-
-// Handle sending forgot password request
-forgotBtn?.addEventListener("click", async () => {
-    const email = document.getElementById("forgot-email").value.trim();
-    if (!email) return showToast("Email is required", "danger");
-
-    try {
-        const res = await fetch("auth.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({ action: "forgot_password", email }),
-        });
-        const text = await res.text();
-        if (text.includes("success")) {
-            showToast("Password reset link sent to your email!", "success");
-            forgotSection.classList.add("hidden");
-            loginSection.classList.remove("hidden");
-        } else {
-            showToast(text, "danger");
-        }
-    } catch (e) {
-        showToast("Failed to send reset link. Try again.", "danger");
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "auth.php", true);
+  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200 && xhr.responseText.includes("success")) {
+        showToast("Login successful!", "success");
+        window.location.href = "dashboard.php";
+      } else {
+        showToast("Sorry, couldn't login. Please try again.", "error");
+      }
     }
+  };
+  xhr.send(
+    "action=login&email=" +
+      encodeURIComponent(email) +
+      "&password=" +
+      encodeURIComponent(password)
+  );
 });
 
+document.getElementById("signup-btn")?.addEventListener("click", function () {
+  const name = document.getElementById("signup-name").value.trim();
+  const email = document.getElementById("signup-email").value.trim();
+  const password = document.getElementById("signup-password").value;
+
+  if (!name || !email || !password)
+    return showToast("Please fill all required fields", "warning");
+  if (!isValidEmail(email)) return showToast("Invalid email format", "error");
+  if (password.length < 6)
+    return showToast("Password must be at least 6 characters", "warning");
+
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "auth.php", true);
+  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200 && xhr.responseText.includes("success")) {
+        showToast("Signup successful! Please login.", "success");
+        signupSection.classList.add("hidden");
+        loginSection.classList.remove("hidden");
+      } else {
+        showToast(xhr.responseText || "Signup failed", "error");
+      }
+    }
+  };
+  xhr.send(
+    "action=signup&name=" +
+      encodeURIComponent(name) +
+      "&email=" +
+      encodeURIComponent(email) +
+      "&password=" +
+      encodeURIComponent(password)
+  );
+});
+
+document.getElementById("forgot-btn")?.addEventListener("click", function () {
+  const email = document.getElementById("forgot-email").value.trim();
+  if (!email) return showToast("Please enter your email", "warning");
+  if (!isValidEmail(email)) return showToast("Invalid email format", "error");
+
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "auth.php", true);
+  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200 && xhr.responseText.includes("success")) {
+        showToast("Reset link sent! Check your email.", "success");
+        forgotSection.classList.add("hidden");
+        loginSection.classList.remove("hidden");
+      } else {
+        showToast(xhr.responseText || "Failed to send reset link", "error");
+      }
+    }
+  };
+  xhr.send("action=forgot_password&email=" + encodeURIComponent(email));
+});
+
+window.handleCredentialResponse = function (response) {
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "auth.php", true);
+  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200 && xhr.responseText.includes("success")) {
+        showToast("Google sign-in successful!", "success");
+        window.location.href = "dashboard.php";
+      } else {
+        showToast("Google sign-in failed.", "error");
+      }
+    }
+  };
+  xhr.send("action=google&id_token=" + encodeURIComponent(response.credential));
+};
